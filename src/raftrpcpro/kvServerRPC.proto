@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package raftKVRpcProtoc;
+
+//这意味着编译器将生成用于RPC调用的客户端和服务器端代码。
+option cc_generic_services = true; //开启stub服务
+
+//Key（要获取的键），ClientId（发起请求的客户端ID），和RequestId（请求的唯一标识符）。
+message GetArgs {
+    bytes Key = 1;
+    bytes ClientId = 2;
+    int32 RequestId = 3;
+}
+
+//Err（错误信息，如果有的话）和Value（与Key关联的值）。
+message GetReply {
+    bytes Err = 1;
+    bytes Value = 2;
+}
+
+//Key（键），Value（值），Op（操作类型，例如"Put"或"Append"）
+//ClientId（客户端ID），和RequestId（请求ID）。
+message PutAppendArgs {
+    bytes Key = 1;
+    bytes Value = 2;
+    bytes Op = 3;
+    bytes ClientId = 4;
+    int32 RequestId= 5;
+}
+
+//
+message PutAppendReply {
+    bytes Err = 1;
+}
+//rpc之间通信
+service kvServerRpc {
+    //客户端调用这个方法来执行"Put"或"Append"操作。
+    rpc PutAppend(PutAppendArgs) returns(PutAppendReply);
+    //客户端调用这个方法来获取与给定Key关联的Value。
+    rpc Get(GetArgs) returns(GetReply);
+}
