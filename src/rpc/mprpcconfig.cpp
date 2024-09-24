@@ -9,14 +9,14 @@ void MprpcConfig::LoadConfigFile(const char *config_file) {
         std::cout << config_file << "is not exist!" << std::endl;
         exit(EXIT_FAILURE);
     }
-
+    // 1.注释   2.正确的配置项 =    3.去掉开头的多余的空格
     while (!feof(pf)) {
         char buf[512] = {0}; //存储读的每行
         fgets(buf, 512, pf);
-
+        // 去掉字符串前面多余的空格
         std::string read_buf(buf);
         Trim(read_buf);
-
+        // 判断#的注释以及是否空行
         if (read_buf[0] = '#' || read_buf.empty()) {
             continue;
         }
@@ -61,6 +61,7 @@ void MprpcConfig::Trim(std::string &src_buf) {
         src_buf = src_buf.substr(idx + 1, src_buf.size() - idx - 1); //更新新字符串
     }
     idx = src_buf.find_last_not_of(' ');
+    // 说明字符串后面有空格
     if (idx != -1) {
         src_buf.substr(0, idx + 1);
     }

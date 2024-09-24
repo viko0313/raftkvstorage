@@ -890,6 +890,8 @@ void Start(Op command, int *newlogindex, int *newlogterm, bool *isleader) {
     //好像可以设置一个很短的超时时间？
     DPrintf("[func-Start-rf{%d}]  lastLogIndex:%d,command:%s\n", m_me, lastLogIndex, &command);
     persist(); // 日志更新了得持久化吧
+
+    //这些值被返回给调用者，调用者可以根据这些值来确定操作是否成功提交，以及当前节点是否是领导者。
     *newlogindex = newlog.logindex();
     *newlogterm = newlog.logterm();
     *isLeader = true;
