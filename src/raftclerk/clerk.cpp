@@ -2,7 +2,7 @@
 
 #include "raftServerRpcUtil.h"
 
-#include "util.h"
+#include "../common/include/util.h"
 
 #include <string>
 #include <vector>
@@ -38,7 +38,7 @@ std::string Clerk::Get(std::string key) {
     }
     // 如果回复错误码为OK，表示获取成功
     if (reply.err() == OK) {
-      // 更新最近一次成功交互的服务器ID
+      // 更新最近一次成功交互的服务器ID（因为代
       m_recentLeaderId = server;
       // 返回获取到的值
       return reply.value();
@@ -52,14 +52,20 @@ void Clerk::PutAppend(std::string key, std::string value, std::string op) {
     m_requestId++;
     auto requestId = m_requestId;
     auto server = m_recentLeaderId;
+    raftKVRpcProctoc::PutAppendArgs args;
+    args.set_key(key);
+    args.set_value(value);
+    args.set_op(op);
+    args.set_clientid(m_clientId);
+    args.set_requestid(requestId);
     while (true) {
-        raftKVRpcProtoc::PutAppendArgs args;
-        args.set_key(key);
-        args.set_value(value);
-        args.set_op(op);
-        args.set_clientid(m_clientId);
-        args.set_requestid(requestId);
-        raftKVRpcProtoc::PutAppendReply reply;
+        // raftKVRpcProctoc::PutAppendArgs args;
+        // args.set_key(key);
+        // args.set_value(value);
+        // args.set_op(op);
+        // args.set_clientid(m_clientId);
+        // args.set_requestid(requestId);
+        raftKVRpcProctoc::PutAppendReply reply;
         bool ok = m_server[server]->PutAppend(&args, &reply);
 
         if (!ok || reply.err() == ErrWrongLeader) {
@@ -74,7 +80,7 @@ void Clerk::PutAppend(std::string key, std::string value, std::string op) {
             server = (server + 1) % m_servers.size();  // try the next server
             continue;
         }
-        if (reply.err() == ok) {
+        if (reply.err() == ok) { //什么时候reply errno为ok呢？？？
             m_recentLeaderId = server;
             return;
         }
@@ -88,6 +94,7 @@ void Clerk::Append(std::string key, std::string value) { PutAppend(key, value, "
 void Clerk::Init(std::string configFileName) {
   //获取所有raft节点ip、port ，并进行连接
   MprpcConfig config;
+  //todo: MprpcConfig有点手生
   config.LoadConfigFile(configFileName.c_str());
   std::vector<std::pair<std::string, short>> ipPortVt;
   for (int i = 0; i < INT_MAX - 1; ++i) {

@@ -21,6 +21,7 @@ private:
     int m_requestId;
     int m_recentLeaderId;  //只是有可能是领导
 
+    //这个实现方式并不符合通用唯一识别码（UUID）的标准生成方法，应确保全局唯一且具有高度的随机性
     std::string Uuid() {
         return std::to_string(rand()) + std::to_string(rand()) + std::to_string(rand()) + std::to_string(rand());
     }  //用于返回随机的clientId

@@ -27,7 +27,7 @@ bool RaftRpcUtil::RequestVote(raftRpcProctoc::RequestVoteArgs *args, raftRpcProc
 RaftRpcUtil::RaftRpcUtil(std::string ip, short port)
 {   
     //使用提供的 IP 和端口创建一个 MprpcChannel 对象，并用它来创建一个 raftRpc_Stub 对象。这个 Stub 对象是客户端用于发起 RPC 调用的代理。
-    stub_->new raftRpcProtoc::raftRpc_Stub(new MprpcChannel(ip, port, true));
+    stub_ = new raftRpcProtoc::raftRpc_Stub(new MprpcChannel(ip, port, true));
 }
 RaftRpcUtil::~RaftRpcUtil() {
     delete stub_; //必须释放指针的呀

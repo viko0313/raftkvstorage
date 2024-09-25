@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package raftKVRpcProtoc;
+package raftKVRpcProctoc;
 
 //这意味着编译器将生成用于RPC调用的客户端和服务器端代码。
 option cc_generic_services = true; //开启stub服务

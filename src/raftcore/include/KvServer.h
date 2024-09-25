@@ -32,7 +32,8 @@ private:
     SkipList<std::string, std::string> m_skipList;
     // 哈希表，用于存储键值对数据，提供快速访问
     std::unordered_map<std::string, std::string> m_kvDB;
-    // index(raft) -> chan  //？？？字段含义   waitApplyCh是一个map，键是int，值是Op类型的管道
+
+    // index(raft) -> chan  //存放等待该日志条目被应用到状态机的请求。
     std::unordered_map<int, LockQueue<Op> *> waitApplyCh;
     
 // clientid -> requestID  //一个kV服务器可能连接多个client记录每个客户端最后请求的ID，用于幂等性检查
@@ -92,6 +93,7 @@ public:
 
     std::string MakeSnapShot();
 public:
+    //接受外部clerk的put或者get指令
     void PutAppend(google::protobuf::RpcController *controller, const ::raftKVRpcProctoc::PutAppendArgs *request,
                    ::raftKVRpcProctoc::PutAppendReply *response, ::google::protobuf::Closure *done) override;
 

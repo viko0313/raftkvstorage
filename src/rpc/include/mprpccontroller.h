@@ -11,7 +11,7 @@ public:
     std::string ErrorText() const;
     void SetFailed(const std::string &reason);
 
-    // 目前为实现的功能
+    // 目前没实现的功能
     void StartCancel();
     bool IsCanceled() const;
     // 实现这个就是异步了吧

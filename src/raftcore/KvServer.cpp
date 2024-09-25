@@ -93,8 +93,9 @@ void kvServer::Get(const raftKVRpcProctoc::GetArgs *args,
         reply->set_err(ErrWrongLeader);
         return;
     }
-    m_mtx.lock();
 
+    m_mtx.lock();
+    //存放等待该日志条目被应用到状态机的请求。
     if (waitApplyCh.find(raftIndex) == waitApplyCh.end()) {
         waitApplyCh.insert(std::make_pair(raftIndex, new LockQueue<Op>()));
     }
@@ -279,9 +280,9 @@ void kvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
             m_me, m_me, raftIndex, &op.ClientId, op.RequestId, &op.Operation, &op.Key, &op.Value);
 
         if (ifRequestDuplicate(op.ClientId, op.RequestId)) {
-        reply->set_err(OK);  // 超时了,但因为是重复的请求，返回ok，实际上就算没有超时，在真正执行的时候也要判断是否重复
+            reply->set_err(OK);  // 超时了,但因为是重复的请求，返回ok，实际上就算没有超时，在真正执行的时候也要判断是否重复
         } else {
-        reply->set_err(ErrWrongLeader);  ///这里返回这个的目的让clerk重新尝试
+            reply->set_err(ErrWrongLeader);  ///这里返回这个的目的让clerk重新尝试
         }
     } else {
         DPrintf(
@@ -290,9 +291,9 @@ void kvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
             m_me, m_me, raftIndex, &op.ClientId, op.RequestId, &op.Operation, &op.Key, &op.Value);
         if (raftCommitOp.ClientId == op.ClientId && raftCommitOp.RequestId == op.RequestId) {
         //可能发生leader的变更导致日志被覆盖，因此必须检查
-        reply->set_err(OK);
+            reply->set_err(OK);
         } else {
-        reply->set_err(ErrWrongLeader);
+            reply->set_err(ErrWrongLeader);
         }
     }
     m_mtx.lock();
